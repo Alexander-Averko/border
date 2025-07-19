@@ -151,7 +151,7 @@ async def check_and_notify_user(bot: Bot, user_id: int, car_number: str, is_init
         
         # Определяем порог для текущей позиции
         threshold = 0
-        if 100 < current_pos <= 500: threshold = 50
+        if 100 < current_pos <= 500: threshold = 20
         elif 40 < current_pos <= 100: threshold = 15
         elif 20 <= current_pos <= 40: threshold = 10
         elif current_pos < 20: threshold = 3
@@ -163,6 +163,11 @@ async def check_and_notify_user(bot: Bot, user_id: int, car_number: str, is_init
         
         # Отдельная проверка для важной отметки в 20
         if notified_pos > 20 and current_pos <= 20:
+            should_send_notification = True
+            notification_text = f"🔔 Очередь продвинулась! Ваша позиция: **{current_pos}**."
+
+        # Отдельная проверка для важной отметки в 20
+        if notified_pos > 50 and current_pos <= 50:
             should_send_notification = True
             notification_text = f"🔔 Очередь продвинулась! Ваша позиция: **{current_pos}**."
 
