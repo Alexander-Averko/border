@@ -25,7 +25,7 @@ def format_car_info(
     info_text = f"🚗 **Всего машин в очереди: {total_cars}**\n\n"
 
     user_status_text = status_map.get(user_car_data['status'], "Неизвестный статус")
-    user_reg_time = datetime.datetime.strptime(user_car_data['registration_date'], date_format).astimezone(TIMEZONE)
+    user_reg_time = datetime.datetime.strptime(user_car_data['registration_date'], date_format).astimezone()
     
     info_text += (
         f"🚙 **Ваш авто:** `{user_car_data['regnum']}`\n"
@@ -33,7 +33,7 @@ def format_car_info(
     )
 
     if user_car_data['status'] == 3:
-        changed_time = datetime.datetime.strptime(user_car_data['changed_date'], date_format).astimezone(TIMEZONE)
+        changed_time = datetime.datetime.strptime(user_car_data['changed_date'], date_format).astimezone()
         wait_time = changed_time - user_reg_time
         info_text += f"⏱ **Время ожидания (до вызова):** `{str(wait_time).split('.')[0]}`\n"
     else:
@@ -41,16 +41,17 @@ def format_car_info(
         wait_time = current_time - user_reg_time
         info_text += (
             f"📍 **Позиция в очереди:** `{user_car_data['order_id']}`\n"
+            f"📅 **Зарегистрирован:** `{user_reg_time.strftime(date_format)}`\n"
             f"⏳ **В очереди уже:** `{str(wait_time).split('.')[0]}`\n"
         )
 
     if first_car_overall and first_car_overall.get('regnum') != user_car_data.get('regnum'):
         info_text += "\n---\n"
-        reg_time = datetime.datetime.strptime(first_car_overall['registration_date'], date_format).astimezone(TIMEZONE)
+        reg_time = datetime.datetime.strptime(first_car_overall['registration_date'], date_format).astimezone()
         
         if first_car_overall['status'] == 3:
             title = "🔝 Вызван в ПП"
-            changed_time = datetime.datetime.strptime(first_car_overall['changed_date'], date_format).astimezone(TIMEZONE)
+            changed_time = datetime.datetime.strptime(first_car_overall['changed_date'], date_format).astimezone()
             wait_time_str = str(changed_time - reg_time).split('.')[0]
             
             info_text += (
@@ -72,7 +73,7 @@ def format_car_info(
 
     if first_waiting_car and first_waiting_car.get('regnum') != user_car_data.get('regnum'):
         info_text += "---\n"
-        reg_time = datetime.datetime.strptime(first_waiting_car['registration_date'], date_format).astimezone(TIMEZONE)
+        reg_time = datetime.datetime.strptime(first_waiting_car['registration_date'], date_format).astimezone()
         current_time = datetime.datetime.now(TIMEZONE)
         wait_time_str = str(current_time - reg_time).split('.')[0]
         
@@ -166,7 +167,7 @@ async def check_and_notify_user(bot: Bot, user_id: int, car_number: str, is_init
             should_send_notification = True
             notification_text = f"🔔 Очередь продвинулась! Ваша позиция: **{current_pos}**."
 
-        # Отдельная проверка для важной отметки в 20
+        # Отдельная проверка для важной отметки в 50
         if notified_pos > 50 and current_pos <= 50:
             should_send_notification = True
             notification_text = f"🔔 Очередь продвинулась! Ваша позиция: **{current_pos}**."
